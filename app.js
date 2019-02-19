@@ -18,17 +18,19 @@ app.all('*', function(req, res, next){
 })
   
 app.get('/', async(req, res, next)=>{
-    const allusers = await User.findAll()
-    await res.send(main(allusers, myHitCounter))
-    next()
+    try{
+        const allusers = await User.findAll()
+        res.send(main(allusers, myHitCounter))
+    }
+    catch(error){next('Could not get all users!')}
+    
 })
 
 app.post('/', async(req, res, next)=>{
     try{
         const newuser =  {first: req.body.first, last: req.body.last}
         await User.create(newuser)
-        await res.redirect('/')
-        next()
+        res.redirect('/')
     }
     catch(error){
         (next('Please enter first and last name!'))
@@ -43,8 +45,7 @@ app.delete('/:id', async(req, res, next)=>{
                     id: req.params.id*1
                 }
             })
-        await res.redirect('/')
-        next()
+        res.redirect('/')
     }
     catch(error){next(error)}
 })
