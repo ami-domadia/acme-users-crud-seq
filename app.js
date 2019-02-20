@@ -1,6 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
-const main = require('./view.js')
+const {main, individual} = require('./view.js')
 const {User, sync} = require('./db.js')
 const methodOverride = require('method-override')
 
@@ -23,6 +23,25 @@ app.get('/', async(req, res, next)=>{
         res.send(main(allusers, myHitCounter))
     }
     catch(error){next('Could not get all users!')}
+    
+})
+
+app.get('/:userid', async(req, res, next)=>{
+    try{
+        const user = await User.findOne({where: {id: req.params.userid*1}})
+        res.send(individual(user, myHitCounter))
+    }
+    catch(error){next('Could not get this user!')}
+    
+})
+
+app.put('/:userid', async(req, res, next)=>{
+    try{
+        const user = await User.findOne({where: {id: req.params.userid*1}})
+        await user.update({first: req.body.first, last: req.body.last})
+        res.send(individual(user, myHitCounter))
+    }
+    catch(error){next('Could not update this user!')}
     
 })
 
